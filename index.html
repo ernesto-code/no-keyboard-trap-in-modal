@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demo: Problema de foco en modal</title>
+
+  <style>
+    :root {
+      --primary: #1d4ed8;
+      --primary-dark: #1e40af;
+      --secondary: #0f172a;
+      --muted: #64748b;
+      --background: #f8fafc;
+      --surface: #ffffff;
+      --surface-soft: #eef2ff;
+      --border: #e2e8f0;
+      --focus: #facc15;
+      --shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family:
+        Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(29, 78, 216, 0.12), transparent 32%),
+        linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+      color: var(--secondary);
+      line-height: 1.5;
+    }
+
+    *:focus {
+      outline: 4px solid var(--focus);
+      outline-offset: 4px;
+    }
+
+    a {
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .app-shell {
+      min-height: 100vh;
+    }
+
+    header {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .nav {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 18px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      font-size: 1.1rem;
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), #38bdf8);
+      box-shadow: 0 10px 24px rgba(29, 78, 216, 0.25);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 48px 28px 72px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 28px;
+      align-items: stretch;
+      margin-bottom: 28px;
+    }
+
+    .hero-card,
+    .panel {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-card {
+      padding: 42px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      right: -80px;
+      top: -80px;
+      width: 220px;
+      height: 220px;
+      border-radius: 999px;
+      background: rgba(29, 78, 216, 0.09);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: var(--surface-soft);
+      color: var(--primary-dark);
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      line-height: 1.05;
+      letter-spacing: -0.06em;
+      margin: 0 0 18px;
+      max-width: 720px;
+    }
+
+    h2 {
+      font-size: 1.25rem;
+      margin: 0 0 16px;
+      letter-spacing: -0.02em;
+    }
+
+    p {
+      color: var(--muted);
+    }
+
+    .hero-text {
+      max-width: 650px;
+      font-size: 1.08rem;
+      margin-bottom: 28px;
+    }
+
+    .hero-actions,
+    .button-row,
+    .dialog-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    button,
+    .button-link {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font: inherit;
+      font-weight: 750;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      transition:
+        transform 140ms ease,
+        box-shadow 140ms ease,
+        background 140ms ease;
+    }
+
+    button:hover,
+    .button-link:hover {
+      transform: translateY(-1px);
+    }
+
+    .primary-button {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 12px 24px rgba(29, 78, 216, 0.22);
+    }
+
+    .primary-button:hover {
+      background: var(--primary-dark);
+    }
+
+    .secondary-button,
+    .button-link {
+      background: white;
+      color: var(--secondary);
+      border: 1px solid var(--border);
+    }
+
+    .danger-button {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .metric-card {
+      padding: 28px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .metric {
+      padding: 18px;
+      border-radius: 16px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 1.8rem;
+      letter-spacing: -0.04em;
+      color: var(--secondary);
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+
+    .panel {
+      padding: 28px;
+    }
+
+    .panel.full {
+      grid-column: 1 / -1;
+    }
+
+    label,
+    legend {
+      font-weight: 750;
+      color: var(--secondary);
+    }
+
+    fieldset {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      margin: 18px 0;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      display: block;
+      margin-top: 8px;
+      margin-bottom: 18px;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font: inherit;
+      background: white;
+      color: var(--secondary);
+    }
+
+    input[type="checkbox"],
+    input[type="radio"] {
+      width: auto;
+      display: inline-block;
+      margin: 0 10px 0 0;
+    }
+
+    .choice {
+      display: flex;
+      align-items: center;
+      margin: 12px 0;
+      color: var(--muted);
+    }
+
+    .notice {
+      margin-top: 24px;
+      padding: 18px;
+      border-radius: 16px;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      color: #78350f;
+    }
+
+    .notice p {
+      color: #78350f;
+      margin: 0;
+    }
+
+    .support-links {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin: 10px 0 22px;
+    }
+
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.62);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      pointer-events: none;
+    }
+
+    .overlay.is-open {
+      display: flex;
+    }
+
+    .dialog {
+      width: min(520px, 100%);
+      background: white;
+      border-radius: 24px;
+      padding: 30px;
+      box-shadow: 0 30px 80px rgba(15, 23, 42, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      pointer-events: auto;
+      position: relative;
+    }
+
+    .dialog-close {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 42px;
+      height: 42px;
+      padding: 0;
+      border-radius: 999px;
+      background: #f8fafc;
+      color: var(--secondary);
+      border: 1px solid var(--border);
+      box-shadow: none;
+      font-size: 1.4rem;
+      line-height: 1;
+    }
+
+    .dialog-close:hover {
+      background: #e2e8f0;
+    }
+
+    .dialog-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background: #dbeafe;
+      color: var(--primary-dark);
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      font-size: 1.4rem;
+      margin-bottom: 18px;
+    }
+
+    .dialog h2 {
+      font-size: 1.55rem;
+      margin-bottom: 10px;
+      padding-right: 48px;
+    }
+
+    .dialog p {
+      margin: 0 0 12px;
+    }
+
+    @media (max-width: 850px) {
+      .hero,
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-card {
+        padding: 30px;
+      }
+
+      .nav {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-shell">
+    <header>
+      <div class="nav">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true"></div>
+          Panel AccessPro
+        </div>
+
+        <div class="nav-actions">
+          <button class="secondary-button">Notificaciones</button>
+          <button class="secondary-button">Configuración</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-card">
+          <div class="eyebrow">Demo de implementación accesible</div>
+
+          <h1>Comportamiento del modal y gestión del foco de teclado</h1>
+
+          <p class="hero-text">
+            Esta demo muestra una implementación incorrecta de un modal. El diálogo
+            se abre visualmente, pero el foco de teclado permanece en la página principal.
+          </p>
+
+          <div class="hero-actions">
+            <button id="openDialog" class="primary-button">
+              Abrir diálogo
+            </button>
+
+            <button class="secondary-button">
+              Guardar panel
+            </button>
+
+            <a href="#profile" class="button-link">
+              Editar cuenta
+            </a>
+          </div>
+
+          <div class="notice">
+            <p>
+              Después de abrir el diálogo, presiona <strong>Tab</strong> varias veces.
+              El indicador de foco continuará moviéndose por los controles que están detrás del modal.
+            </p>
+          </div>
+        </div>
+
+        <aside class="hero-card metric-card" aria-label="Resumen de la demo">
+          <div class="metric">
+            <strong>1</strong>
+            <span>El diálogo se abre visualmente</span>
+          </div>
+
+          <div class="metric">
+            <strong>2</strong>
+            <span>El foco permanece detrás</span>
+          </div>
+
+          <div class="metric">
+            <strong>3</strong>
+            <span>La navegación continúa en la página principal</span>
+          </div>
+        </aside>
+      </section>
+
+      <div class="grid">
+        <section id="profile" class="panel">
+          <h2>Perfil de la cuenta</h2>
+
+          <label for="name">Nombre completo</label>
+          <input id="name" type="text" value="Alex Morgan" />
+
+          <label for="email">Correo electrónico</label>
+          <input id="email" type="email" value="alex@example.com" />
+
+          <label for="country">País</label>
+          <select id="country">
+            <option>España</option>
+            <option>Portugal</option>
+            <option>Estados Unidos</option>
+            <option>Panamá</option>
+          </select>
+
+          <button class="primary-button">Actualizar perfil</button>
+        </section>
+
+        <section class="panel">
+          <h2>Preferencias de notificación</h2>
+
+          <div class="choice">
+            <input id="emailNotifications" type="checkbox" />
+            <label for="emailNotifications">Recibir notificaciones por correo</label>
+          </div>
+
+          <div class="choice">
+            <input id="smsNotifications" type="checkbox" />
+            <label for="smsNotifications">Recibir notificaciones por SMS</label>
+          </div>
+
+          <fieldset>
+            <legend>Método de contacto preferido</legend>
+
+            <div class="choice">
+              <input id="contactEmail" name="contactMethod" type="radio" />
+              <label for="contactEmail">Correo electrónico</label>
+            </div>
+
+            <div class="choice">
+              <input id="contactPhone" name="contactMethod" type="radio" />
+              <label for="contactPhone">Teléfono</label>
+            </div>
+          </fieldset>
+
+          <button class="primary-button">Guardar preferencias</button>
+        </section>
+
+        <section class="panel full">
+          <h2>Centro de soporte</h2>
+
+          <p>
+            Visita nuestros recursos de ayuda o envía un mensaje al equipo de soporte.
+          </p>
+
+          <div class="support-links">
+            <a href="#help">Centro de ayuda</a>
+            <a href="#documentation">Documentación</a>
+            <a href="#terms">Términos y condiciones</a>
+          </div>
+
+          <label for="message">Mensaje</label>
+          <textarea id="message" rows="4">Necesito ayuda con mi cuenta.</textarea>
+
+          <div class="button-row">
+            <button class="primary-button">Enviar mensaje</button>
+            <button class="secondary-button">Guardar borrador</button>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <div id="dialogOverlay" class="overlay" role="presentation">
+      <div
+        id="demoDialog"
+        class="dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="dialogTitle"
+        aria-describedby="dialogDescription"
+      >
+        <button id="closeDialogTop" class="dialog-close" aria-label="Cerrar diálogo">
+          ×
+        </button>
+
+        <div class="dialog-icon" aria-hidden="true">!</div>
+
+        <h2 id="dialogTitle">Confirmar actualización del panel</h2>
+
+        <p id="dialogDescription">
+          Este diálogo está visible, pero el foco de teclado no se ha movido dentro de él.
+        </p>
+
+        <p>
+          Este comportamiento es intencionalmente incorrecto para fines de demostración.
+        </p>
+
+        <div class="dialog-actions">
+          <button id="confirmButton" class="primary-button">Confirmar</button>
+          <button id="closeDialog" class="secondary-button">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const openDialogButton = document.getElementById('openDialog');
+    const dialogOverlay = document.getElementById('dialogOverlay');
+    const closeDialogButton = document.getElementById('closeDialog');
+    const closeDialogTopButton = document.getElementById('closeDialogTop');
+
+    function closeDialog() {
+      dialogOverlay.classList.remove('is-open');
+      //openDialogButton.focus();
+    }
+
+    openDialogButton.addEventListener('click', () => {
+      dialogOverlay.classList.add('is-open');
+
+      /*
+        Comportamiento intencionalmente incorrecto para la demo:
+        El diálogo se abre visualmente, pero el foco permanece en el botón que lo activó.
+        Esto permite que el foco continúe moviéndose por la página detrás del modal.
+      */
+      openDialogButton.focus();
+    });
+
+    closeDialogButton.addEventListener('click', closeDialog);
+    closeDialogTopButton.addEventListener('click', closeDialog);
+
+    document.addEventListener('keydown', (event) => {
+      if (
+        event.key === 'Escape' &&
+        dialogOverlay.classList.contains('is-open')
+      ) {
+        closeDialog();
+      }
+    });
+  </script>
+</body>
+</html>
